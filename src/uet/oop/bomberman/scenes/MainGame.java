@@ -15,11 +15,9 @@ import javafx.util.Duration;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.KeyEvents;
 import uet.oop.bomberman.entities.enemys.*;
+import uet.oop.bomberman.entities.items.*;
 import uet.oop.bomberman.entities.players.Bomber;
 import uet.oop.bomberman.entities.Entity;
-import uet.oop.bomberman.entities.items.BombItem;
-import uet.oop.bomberman.entities.items.FlameItem;
-import uet.oop.bomberman.entities.items.SpeedItem;
 import uet.oop.bomberman.entities.tiles.Brick;
 import uet.oop.bomberman.entities.tiles.Grass;
 import uet.oop.bomberman.entities.tiles.Portal;
@@ -243,6 +241,18 @@ public class MainGame {
                     case 's':
                         a.add(new Grass(i, r, Sprite.grass));
                         a.add(new SpeedItem(i, r, Sprite.powerup_speed));
+                        a.add(new Brick(i, r, Sprite.brick));
+                        map.add(a);
+                        break;
+                    case '(':
+                        a.add(new Grass(i, r, Sprite.grass));
+                        a.add(new FlamepassItem(i, r, Sprite.powerup_flamepass));
+                        a.add(new Brick(i, r, Sprite.brick));
+                        map.add(a);
+                        break;
+                    case ')':
+                        a.add(new Grass(i, r, Sprite.grass));
+                        a.add(new BombpassItem(i, r, Sprite.powerup_bombpass));
                         a.add(new Brick(i, r, Sprite.brick));
                         map.add(a);
                         break;
