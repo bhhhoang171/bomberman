@@ -27,6 +27,7 @@ import uet.oop.bomberman.entities.tiles.Wall;
 import uet.oop.bomberman.graphics.MenuTextures;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.net.Client;
+import uet.oop.bomberman.sounds.SoundLib;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -105,6 +106,9 @@ public class MainGame {
                     timeline.stop();
                     paused = true;
                     SceneLib.switchToMenu();
+                    if (SoundLib.gameTheme.isPlaying()) {
+                        SoundLib.gameTheme.stop();
+                    }
                 } else if (event.getX() >= 676 && event.getX() <= 699 &&
                         event.getY() >= 40 && event.getY() <= 68) {
                     if (chooseGamePlay == Gameplay.PVE) {
@@ -152,6 +156,9 @@ public class MainGame {
         KeyFrame oneFrame = new KeyFrame(oneFrameAmt, new EventHandler() {
             @Override
             public void handle(Event event) {
+                if (!SoundLib.gameTheme.isPlaying()) {
+                    SoundLib.gameTheme.play();
+                }
                 if (!MainGame.paused) {
                     update();
                     render();
@@ -288,6 +295,9 @@ public class MainGame {
         enemies.forEach(Enemy::update);
         if (chooseGamePlay == Gameplay.PVE) {
             if (bombers.size() == 0) {
+                if (SoundLib.gameTheme.isPlaying()) {
+                    SoundLib.gameTheme.stop();
+                }
                 timeline.stop();
                 paused = true;
                 Temp.win = false;
@@ -295,6 +305,9 @@ public class MainGame {
             }
         } else {
             if (bombers.size() == 1) {
+                if (SoundLib.gameTheme.isPlaying()) {
+                    SoundLib.gameTheme.stop();
+                }
                 timeline.stop();
                 paused = true;
                 SceneLib.switchToPvpEndingScene();
@@ -315,43 +328,64 @@ public class MainGame {
         int doll = 1;
         for (Enemy enemy : enemies) {
             if (enemy.getTimeAfterDead() <= 0) {
+                if (!SoundLib.enemyDead.isPlaying()) {
+                    SoundLib.enemyDead.play();
+                }
                 gc.setFont(BombermanGame.font1);
                 gc.setFill(Color.WHITE);
                 if (enemy instanceof Ovape) {
                     gc.fillText("+" + Ovape.point * ovape,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
+                    if (!enemy.isScored()) {
+                        score += Ovape.point * ovape;
+                        enemy.setScored();
+                    }
                     ++ovape;
-                    score += Ovape.point * ovape;
                 } else if (enemy instanceof Pontan) {
                     gc.fillText("+" + Pontan.point * pontan,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
+                    if (!enemy.isScored()) {
+                        score += Pontan.point * pontan;
+                        enemy.setScored();
+                    }
                     ++pontan;
-                    score += Pontan.point * pontan;
                 } else if (enemy instanceof Doll) {
                     gc.fillText("+" + Doll.point * doll,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
+                    if (!enemy.isScored()) {
+                        score += Doll.point * doll;
+                        enemy.setScored();
+                    }
                     ++doll;
-                    score += Doll.point * doll;
                 } else if (enemy instanceof Kondoria) {
                     gc.fillText("+" + Kondoria.point * kondoria,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
+                    if (!enemy.isScored()) {
+                        score += Kondoria.point * kondoria;
+                        enemy.setScored();
+                    }
                     ++kondoria;
-                    score += Kondoria.point * kondoria;
                 } else if (enemy instanceof Oneal) {
                     gc.fillText("+" + Oneal.point * oneal,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
+                    if (!enemy.isScored()) {
+                        score += Oneal.point * oneal;
+                        enemy.setScored();
+                    }
                     ++oneal;
-                    score += Oneal.point * oneal;
                 } else if (enemy instanceof  Balloom) {
                     gc.fillText("+" + Balloom.point * balloom,
                             enemy.getPosX() + 1.0f * Sprite.SCALED_SIZE / 2 + camX,
                             enemy.getPosY() + 1.0f * Sprite.SCALED_SIZE / 2 + camY);
-                    score += Balloom.point * balloom;
+                    if (!enemy.isScored()) {
+                        score += Balloom.point * balloom;
+                        enemy.setScored();
+                    }
                     ++balloom;
                 }
             }
@@ -377,6 +411,8 @@ public class MainGame {
                 gc.fillText(Integer.toString(bombers.get(0).bombCount), 52, 67);
                 gc.fillText(Integer.toString(bombers.get(0).flameWidth), 50, 103);
             }
+            gc.setFont(new Font("Comic San MS", 24));
+            gc.fillText(Integer.toString(MainGame.score), 323, 74);
         } else {
             gc.drawImage(MenuTextures.pvpBackground.getImg(), 0, 0);
             gc.setFont(new Font("Comic San MS", 12));

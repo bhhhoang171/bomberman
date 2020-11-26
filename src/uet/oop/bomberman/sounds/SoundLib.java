@@ -21,4 +21,8 @@ public abstract class SoundLib {
             new File("/bomberman/res/sounds/lifelost.mp3").toURI().toString());
     public static AudioClip gameOver = new AudioClip(
             new File("/bomberman/res/sounds/gameover.mp3").toURI().toString());
+    public static AudioClip gameTheme = new AudioClip(
+            new File("/bomberman/res/sounds/gametheme.mp3").toURI().toString());
+    public static AudioClip enemyDead = new AudioClip(
+            new File("/bomberman/res/sounds/enemydead.wav").toURI().toString());
 }

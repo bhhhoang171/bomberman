@@ -6,13 +6,10 @@ import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.entities.Character;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.enemys.Doll;
+import uet.oop.bomberman.entities.items.*;
 import uet.oop.bomberman.entities.tiles.Grass;
 import uet.oop.bomberman.scenes.MainGame;
 import uet.oop.bomberman.entities.enemys.Enemy;
-import uet.oop.bomberman.entities.items.BombItem;
-import uet.oop.bomberman.entities.items.FlameItem;
-import uet.oop.bomberman.entities.items.Item;
-import uet.oop.bomberman.entities.items.SpeedItem;
 import uet.oop.bomberman.entities.tiles.Brick;
 import uet.oop.bomberman.entities.tiles.Portal;
 import uet.oop.bomberman.entities.tiles.Wall;
@@ -32,6 +29,8 @@ public class Bomber extends Character {
     private boolean bombBelowBomber;
     private Bomb bombCollide;
     public int flameWidth;
+    private boolean bombPass = false;
+    private boolean flamePass = false;
 
     public boolean up;
     public boolean down;
@@ -250,9 +249,11 @@ public class Bomber extends Character {
                     if (MainGame.level + 1 == MainGame.MAX_LEVEL_PVE) {
                         Temp.win = true;
                         SceneLib.switchToPveEndingScene();
-                    }
-                    else {
+                    } else {
                         SceneLib.switchToStageCompleteScene();
+                    }
+                    if (SoundLib.gameTheme.isPlaying()) {
+                        SoundLib.gameTheme.stop();
                     }
                     MainGame.paused();
                     MainGame.stop();
@@ -278,6 +279,9 @@ public class Bomber extends Character {
     }
 
     private boolean collideWithBombs(double posX, double posY) {
+        if (bombPass) {
+            return false;
+        }
         boolean collide = false;
         double objX;
         double objY;
@@ -312,6 +316,7 @@ public class Bomber extends Character {
     }
 
     private void collideWithFlame() {
+        if (flamePass) return;
         boolean up = true;
         boolean down = true;
         boolean left = true;
@@ -363,9 +368,11 @@ public class Bomber extends Character {
                                     right = false;
                                 }
                             }
-                            if (checkCollideInMap(objX0, objY1, posX, posY)) {
-                                kill();
-                                return;
+                            if (right) {
+                                if (checkCollideInMap(objX0, objY1, posX, posY)) {
+                                    kill();
+                                    return;
+                                }
                             }
                         } //right
 
@@ -382,9 +389,11 @@ public class Bomber extends Character {
                                     up = false;
                                 }
                             }
-                            if (checkCollideInMap(objX1, objY, posX, posY)) {
-                                kill();
-                                return;
+                            if (up) {
+                                if (checkCollideInMap(objX1, objY, posX, posY)) {
+                                    kill();
+                                    return;
+                                }
                             }
                         } //up
 
@@ -401,9 +410,11 @@ public class Bomber extends Character {
                                     down = false;
                                 }
                             }
-                            if (checkCollideInMap(objX1, objY0, posX, posY)) {
-                                kill();
-                                return;
+                            if (down) {
+                                if (checkCollideInMap(objX1, objY0, posX, posY)) {
+                                    kill();
+                                    return;
+                                }
                             }
                         } //down
                         if (checkCollideInMap(objX1, objY1, posX, posY)) {
@@ -441,26 +452,49 @@ public class Bomber extends Character {
                 ++flameWidth;
                 e.remove(1);
             }
+        } else if (e.get(1) instanceof BombpassItem) {
+            if (checkCollideInMap(objX, objY, posX, posY)) {
+                if (!SoundLib.item.isPlaying()) {
+                    SoundLib.item.play();
+                }
+                bombPass = true;
+                e.remove(1);
+            }
+        } else if (e.get(1) instanceof FlamepassItem) {
+            if (checkCollideInMap(objX, objY, posX, posY)) {
+                if (!SoundLib.item.isPlaying()) {
+                    SoundLib.item.play();
+                }
+                flamePass = true;
+                e.remove(1);
+            }
         }
     }
 
     public void collideWithEnemy() {
+        boolean up = true;
+        boolean down = true;
+        boolean left = true;
+        boolean right = true;
         for (Enemy enemy : MainGame.enemies) {
             if (enemy.isAlive()) {
                 if (checkCollideInMap(enemy.getPosX(), enemy.getPosY(), posX, posY)) {
                     kill();
                     return;
                 }
+            } else if (!flamePass) {
+                int x = (int) (enemy.getPosX() / Sprite.SCALED_SIZE);
+                int y = (int) (enemy.getPosY() / Sprite.SCALED_SIZE);
                 if (enemy instanceof Doll) {
-                    if (enemy.getTimeAfterDead() <= 60) {
+                    if (enemy.getTimeAfterDead() <= 60 && enemy.getTimeAfterDead() > 0) {
                         int k = 1;
-                        while (true){
-                            double objX = (enemy.getX() - k) * Sprite.SCALED_SIZE;
-                            double objY = (enemy.getY() - k) * Sprite.SCALED_SIZE;
-                            double objX0 = (enemy.getX() + k) * Sprite.SCALED_SIZE;
-                            double objY0 = (enemy.getY() + k) * Sprite.SCALED_SIZE;
-                            double objX1 = enemy.getX() * Sprite.SCALED_SIZE;
-                            double objY1 = enemy.getY() * Sprite.SCALED_SIZE;
+                        while (true) {
+                            double objX = (x - k) * Sprite.SCALED_SIZE;
+                            double objY = (y - k) * Sprite.SCALED_SIZE;
+                            double objX0 = (x + k) * Sprite.SCALED_SIZE;
+                            double objY0 = (y + k) * Sprite.SCALED_SIZE;
+                            double objX1 = x * Sprite.SCALED_SIZE;
+                            double objY1 = y * Sprite.SCALED_SIZE;
                             LinkedList<Entity> e;
                             if (left) {
                                 e = MainGame.map.get(y * MainGame.COLUMN[MainGame.level] + x - k);
@@ -496,9 +530,11 @@ public class Bomber extends Character {
                                         right = false;
                                     }
                                 }
-                                if (checkCollideInMap(objX0, objY1, posX, posY)) {
-                                    kill();
-                                    return;
+                                if (right) {
+                                    if (checkCollideInMap(objX0, objY1, posX, posY)) {
+                                        kill();
+                                        return;
+                                    }
                                 }
                             } //right
 
@@ -515,9 +551,11 @@ public class Bomber extends Character {
                                         up = false;
                                     }
                                 }
-                                if (checkCollideInMap(objX1, objY, posX, posY)) {
-                                    kill();
-                                    return;
+                                if (up) {
+                                    if (checkCollideInMap(objX1, objY, posX, posY)) {
+                                        kill();
+                                        return;
+                                    }
                                 }
                             } //up
 
@@ -534,9 +572,11 @@ public class Bomber extends Character {
                                         down = false;
                                     }
                                 }
-                                if (checkCollideInMap(objX1, objY0, posX, posY)) {
-                                    kill();
-                                    return;
+                                if (down) {
+                                    if (checkCollideInMap(objX1, objY0, posX, posY)) {
+                                        kill();
+                                        return;
+                                    }
                                 }
                             } //down
                             if (checkCollideInMap(objX1, objY1, posX, posY)) {

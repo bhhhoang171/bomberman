@@ -20,12 +20,21 @@ import java.util.LinkedList;
 public abstract class Enemy extends Character {
     protected int timeBetweenChangeDirection = 200;
     protected int timeBeforeRemove = 60;
+    private boolean scored = false;
 
     public Enemy(int x, int y, Image img) {
         super(x, y, img);
         posX = x * Sprite.SCALED_SIZE;
         posY = y * Sprite.SCALED_SIZE;
         timeAfterDead = 120;
+    }
+
+    public boolean isScored() {
+        return scored;
+    }
+
+    public void setScored() {
+        this.scored = true;
     }
 
     @Override
