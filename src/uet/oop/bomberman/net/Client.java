@@ -12,6 +12,7 @@ public class Client {
     private Socket socketOfClient = null;
     private BufferedWriter os = null;
     private BufferedReader is = null;
+    private boolean start = false;
 
     public Client() {
         init();
@@ -38,10 +39,12 @@ public class Client {
     }
 
     public void start() {
+
         Thread client = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    String messageTemp = "";
                     while (true) {
                         // Ghi dữ liệu vào luồng đầu ra của Socket tại Client.
                         if (MainGame.clientID != 99) {
@@ -58,9 +61,12 @@ public class Client {
                             if (MainGame.bombers.get(MainGame.clientID).right) {
                                 message += "T";
                             } else message += "F";
-                            os.write(message);
-                            os.newLine(); // kết thúc dòng
-                            os.flush();  // đẩy dữ liệu đi.
+                            if (!message.equals(messageTemp)) {
+                                os.write(message);
+                                os.newLine(); // kết thúc dòng
+                                os.flush();  // đẩy dữ liệu đi.
+                            }
+                            messageTemp = message;
                         }
 
                         // Đọc dữ liệu trả lời từ phía server
@@ -76,11 +82,14 @@ public class Client {
                             MainGame.bombers.get((MainGame.clientID + 1) % 2).down = responseLine.charAt(2) == 'T';
                             MainGame.bombers.get((MainGame.clientID + 1) % 2).right = responseLine.charAt(3) == 'T';
                         }
+                        Thread.sleep(10);
                     }
                 } catch (UnknownHostException e) {
                     System.err.println("Trying to connect to unknown host: " + e);
                 } catch (IOException e) {
                     System.err.println("IOException:  " + e);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });

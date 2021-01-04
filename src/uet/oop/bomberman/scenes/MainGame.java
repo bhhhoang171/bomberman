@@ -294,7 +294,7 @@ public class MainGame {
         int l = enemies.size();
         for (int i = 0; i < l; ++i) {
             if (enemies.get(i) instanceof Ovape) {
-                if (enemies.get(i).getTimeAfterDead() <= 0 && ((Ovape) enemies.get(i)).life > 1) {
+                if (enemies.get(i).getTimeAfterDead() == 0 && ((Ovape) enemies.get(i)).life > 1) {
                     enemies.add(new Ovape(enemies.get(i).getX(), enemies.get(i).getY(), Sprite.ovape_right1, ((Ovape) enemies.get(i)).life - 1));
                     enemies.add(new Ovape(enemies.get(i).getX(), enemies.get(i).getY(), Sprite.ovape_right1, ((Ovape) enemies.get(i)).life - 1));
                 }

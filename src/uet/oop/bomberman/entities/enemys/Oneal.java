@@ -15,6 +15,7 @@ public class Oneal extends Enemy {
     public static final int point = 200;
     private ArrayList<Integer> updateDirection = new ArrayList<>();
     private int[][] distances = new int[MainGame.ROW[MainGame.level]][MainGame.COLUMN[MainGame.level]];
+    private int timeBetweenChangeSpeed = 5;
 
     public Oneal(int x, int y, Image img) {
         super(x, y, img);
@@ -99,8 +100,21 @@ public class Oneal extends Enemy {
         }
     }
 
+    private void changeSpeed() {
+        if (timeBetweenChangeSpeed <= 0) {
+            timeBetweenChangeSpeed = 5;
+            if (posX % 2 == 0 && posY % 2 == 0) {
+                speed = 2f;
+            }
+        } else {
+            speed = 1f;
+        }
+        --timeBetweenChangeSpeed;
+    }
+
     @Override
     public void chooseImg() {
+        changeSpeed();
         switch (direction) {
             case 0:
             case 1:

@@ -96,9 +96,10 @@ public class ServerProgram {
                             os.flush();
                         }
                     }
+                    Thread.sleep(10);
                 }
 
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 System.out.println(e);
                 e.printStackTrace();
             }
